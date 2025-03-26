@@ -1,0 +1,21 @@
+/* Estilos personalizados para la tabla */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+  
+  .action-buttons {
+    white-space: nowrap;
+  }
+  
+  /* Ajustes para botones en móviles */
+  @media (max-width: 768px) {
+    .card-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .p-button {
+      width: 100%;
+    }
+  }
