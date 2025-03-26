@@ -1,0 +1,32 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="text-center">{{ showRegisterForm ? 'Registro' : 'Inicio de Sesión' }}</h3>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="loginForm" (ngSubmit)="showRegisterForm ? onRegister() : onLogin()">
+              <div class="mb-3">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="username" formControlName="username" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" formControlName="password" required>
+              </div>
+              <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">
+                  {{ showRegisterForm ? 'Registrarse' : 'Iniciar Sesión' }}
+                </button>
+                <button type="button" class="btn btn-link" (click)="toggleRegisterForm()">
+                  {{ showRegisterForm ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
