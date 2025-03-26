@@ -1,31 +1,46 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
-import { AppRoutingModule } from './app-routing.module';
+// PrimeNG modules
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ButtonModule } from 'primeng/button';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+
 import { AppComponent } from './app.component';
+import { EncuestaFormComponent } from '../app/components/encuesta-form/encuesta-form/encuesta-form.component';
+import { EncuestaListComponent } from '../app/components/encuesta-form/encuesta-list/encuesta-list.component';
 import { LoginComponent } from './components/login/login.component';
-import { EncuestaListComponent } from './components/encuesta-form/encuesta-list/encuesta-list.component';
-import { EncuestaFormComponent } from './components/encuesta-form/encuesta-form/encuesta-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
+    EncuestaFormComponent,
     EncuestaListComponent,
-    EncuestaFormComponent
+    LoginComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbModule
+    HttpClientModule,
+    RouterModule,
+    // PrimeNG Modules
+    TableModule,
+    ToastModule,
+    ConfirmDialogModule,
+    ButtonModule,
+    DynamicDialogModule
   ],
   providers: [
+    MessageService,
+    ConfirmationService,
+    DialogService
   ],
   bootstrap: [AppComponent]
 })

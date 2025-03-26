@@ -1,324 +1,350 @@
 <div class="container mt-4">
-    <h2>{{ editMode ? 'Editar Encuesta' : 'Nueva Encuesta' }}</h2>
+  <h2>{{ editMode ? 'Editar Encuesta' : 'Nueva Encuesta' }}</h2>
+  
+  <form [formGroup]="encuestaForm" (ngSubmit)="onSubmit()">
+    <!-- CAPÍTULO I - Información Personal -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5>CAPÍTULO I - Información Personal</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">1. ¿Cuál es su país de residencia permanente?</label>
+              <input type="text" class="form-control" formControlName="paisResidencia" 
+                     [class.is-invalid]="submitted && encuestaForm.get('paisResidencia').invalid">
+              <div *ngIf="submitted && encuestaForm.get('paisResidencia').invalid" class="invalid-feedback">
+                Este campo es requerido
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">2. ¿Cuál es su nacionalidad?</label>
+              <input type="text" class="form-control" formControlName="nacionalidad"
+                     [class.is-invalid]="submitted && encuestaForm.get('nacionalidad').invalid">
+              <div *ngIf="submitted && encuestaForm.get('nacionalidad').invalid" class="invalid-feedback">
+                Este campo es requerido
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label">3. Sexo</label>
+              <select class="form-select" formControlName="sexo"
+                      [class.is-invalid]="submitted && encuestaForm.get('sexo').invalid">
+                <option value="">Seleccione...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <div *ngIf="submitted && encuestaForm.get('sexo').invalid" class="invalid-feedback">
+                Este campo es requerido
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label class="form-label">Edad</label>
+              <input type="number" class="form-control" formControlName="edad" min="1"
+                     [class.is-invalid]="submitted && encuestaForm.get('edad').invalid">
+              <div *ngIf="submitted && encuestaForm.get('edad').errors?.required" class="invalid-feedback">
+                Este campo es requerido
+              </div>
+              <div *ngIf="submitted && encuestaForm.get('edad').errors?.min" class="invalid-feedback">
+                La edad debe ser mayor a 0
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">4. ¿Con quién viaja?</label>
+              <select class="form-select" formControlName="viajaCon" (change)="onViajaConChange($event)"
+                      [class.is-invalid]="submitted && encuestaForm.get('viajaCon').invalid">
+                <option value="">Seleccione...</option>
+                <option *ngFor="let opcion of viajaConOptions" [value]="opcion">{{ opcion }}</option>
+              </select>
+              <div *ngIf="submitted && encuestaForm.get('viajaCon').invalid" class="invalid-feedback">
+                Este campo es requerido
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6" *ngIf="encuestaForm.get('viajaCon').value === 'Otro'">
+            <div class="mb-3">
+              <label class="form-label">Especifique con quién viaja</label>
+              <input type="text" class="form-control" formControlName="viajaConOtro"
+                     [class.is-invalid]="submitted && encuestaForm.get('viajaConOtro').invalid">
+              <div *ngIf="submitted && encuestaForm.get('viajaConOtro').invalid" class="invalid-feedback">
+                Por favor especifique con quién viaja
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row" *ngIf="encuestaForm.get('viajaCon').value !== 'Solo'">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">5. ¿Incluyéndolo a usted con cuántas personas viaja?</label>
+              <input type="number" class="form-control" formControlName="cantidadPersonas" min="1"
+                     [class.is-invalid]="submitted && encuestaForm.get('cantidadPersonas').invalid">
+              <div *ngIf="submitted && encuestaForm.get('cantidadPersonas').invalid" class="invalid-feedback">
+                Este campo es requerido y debe ser mayor a 0
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
-    <form [formGroup]="encuestaForm" (ngSubmit)="onSubmit()">
-      <!-- CAPÍTULO I -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5>CAPÍTULO I - Información Personal</h5>
+    <!-- CAPÍTULO II - Motivo y Organización del Viaje -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5>CAPÍTULO II - Motivo y Organización del Viaje</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">6. ¿Cuál fue el principal motivo de este viaje?</label>
+          <select class="form-select" formControlName="motivoViaje" (change)="onMotivoViajeChange($event)"
+                  [class.is-invalid]="submitted && encuestaForm.get('motivoViaje').invalid">
+            <option value="">Seleccione...</option>
+            <option *ngFor="let opcion of motivoViajeOptions" [value]="opcion">{{ opcion }}</option>
+          </select>
+          <div *ngIf="submitted && encuestaForm.get('motivoViaje').invalid" class="invalid-feedback">
+            Este campo es requerido
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">1. ¿Cuál es su país de residencia permanente?</label>
-                <input type="text" class="form-control" formControlName="paisResidencia">
-                <div *ngIf="submitted && encuestaForm.get('paisResidencia')?.errors" class="text-danger">
-                  Este campo es requerido
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">2. ¿Cuál es su nacionalidad?</label>
-                <input type="text" class="form-control" formControlName="nacionalidad">
-                <div *ngIf="submitted && encuestaForm.get('nacionalidad')?.errors" class="text-danger">
-                  Este campo es requerido
-                </div>
-              </div>
-            </div>
+        
+        <div class="mb-3" *ngIf="encuestaForm.get('motivoViaje').value === 'Otro'">
+          <label class="form-label">Especifique el motivo del viaje</label>
+          <input type="text" class="form-control" formControlName="motivoViajeOtro"
+                 [class.is-invalid]="submitted && encuestaForm.get('motivoViajeOtro').invalid">
+          <div *ngIf="submitted && encuestaForm.get('motivoViajeOtro').invalid" class="invalid-feedback">
+            Por favor especifique el motivo del viaje
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">7. ¿Cómo organizó su viaje?</label>
+          <select class="form-select" formControlName="organizacionViaje" (change)="onOrganizacionViajeChange($event)"
+                  [class.is-invalid]="submitted && encuestaForm.get('organizacionViaje').invalid">
+            <option value="">Seleccione...</option>
+            <option *ngFor="let opcion of organizacionViajeOptions" [value]="opcion">{{ opcion }}</option>
+          </select>
+          <div *ngIf="submitted && encuestaForm.get('organizacionViaje').invalid" class="invalid-feedback">
+            Este campo es requerido
+          </div>
+        </div>
+        
+        <div class="mb-3" *ngIf="encuestaForm.get('organizacionViaje').value === 'Otro'">
+          <label class="form-label">Especifique cómo organizó su viaje</label>
+          <input type="text" class="form-control" formControlName="organizacionViajeOtro"
+                 [class.is-invalid]="submitted && encuestaForm.get('organizacionViajeOtro').invalid">
+          <div *ngIf="submitted && encuestaForm.get('organizacionViajeOtro').invalid" class="invalid-feedback">
+            Por favor especifique cómo organizó su viaje
+          </div>
+        </div>
+        
+        <div class="mb-3" *ngIf="['Paquete turístico organizado por una agencia de viajes en Colombia', 
+                                  'Paquete turístico organizado por una agencia de viajes en el país de visita',
+                                  'Paquete turístico organizado por terceros que no sean agencias de viajes'].includes(encuestaForm.get('organizacionViaje').value)">
+          <label class="form-label">a. ¿Qué tipo de servicios comprendió el paquete turístico?</label>
+          <div class="form-check" *ngFor="let servicio of serviciosPaqueteOptions">
+            <input class="form-check-input" type="checkbox" [id]="'servicio-' + servicio" 
+                   (change)="onServicioPaqueteChange(servicio, $event.target.checked)"
+                   [checked]="serviciosPaqueteArray.value.includes(servicio)">
+            <label class="form-check-label" [for]="'servicio-' + servicio">{{ servicio }}</label>
           </div>
           
-          <div class="row">
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">3. Sexo</label>
-                <select class="form-select" formControlName="sexo">
-                  <option value="">Seleccione...</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Femenino">Femenino</option>
-                  <option value="Otro">Otro</option>
-                </select>
-                <div *ngIf="submitted && encuestaForm.get('sexo')?.errors" class="text-danger">
-                  Este campo es requerido
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label class="form-label">Edad</label>
-                <input type="number" class="form-control" formControlName="edad" min="1">
-                <div *ngIf="submitted && encuestaForm.get('edad')?.errors" class="text-danger">
-                  Este campo es requerido y debe ser un número válido
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">4. ¿Con quién viaja?</label>
-                <select class="form-select" formControlName="viajaCon" (change)="onViajaConChange($event)">
-                  <option value="">Seleccione...</option>
-                  <option *ngFor="let opcion of viajaConOptions" [value]="opcion">{{ opcion }}</option>
-                </select>
-                <div *ngIf="submitted && encuestaForm.get('viajaCon')?.errors" class="text-danger">
-                  Este campo es requerido
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6" *ngIf="encuestaForm.get('viajaCon')?.value === 'Otro'">
-              <div class="mb-3">
-                <label class="form-label">Especifique con quién viaja</label>
-                <input type="text" class="form-control" formControlName="viajaConOtro">
-              </div>
-            </div>
-          </div>
-          
-          <div class="row" *ngIf="encuestaForm.get('viajaCon')?.value !== 'Solo'">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label">5. ¿Incluyéndolo a usted con cuántas personas viaja?</label>
-                <input type="number" class="form-control" formControlName="cantidadPersonas" min="1">
-              </div>
-            </div>
+          <div class="mt-2" *ngIf="serviciosPaqueteArray.value.includes('Otro servicio')">
+            <label class="form-label">Especifique el otro servicio</label>
+            <input type="text" class="form-control" formControlName="serviciosPaqueteOtro">
           </div>
         </div>
       </div>
-      
-      <!-- CAPÍTULO II -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5>CAPÍTULO II - Motivo y Organización del Viaje</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label">6. ¿Cuál fue el principal motivo de este viaje?</label>
-            <select class="form-select" formControlName="motivoViaje" (change)="onMotivoViajeChange($event)">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let opcion of motivoViajeOptions" [value]="opcion">{{ opcion }}</option>
-            </select>
-            <div *ngIf="submitted && encuestaForm.get('motivoViaje')?.errors" class="text-danger">
-              Este campo es requerido
-            </div>
+    </div>
+    
+    <!-- CAPÍTULO III - Gastos -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5>CAPÍTULO III - Gastos</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">9. Gastos del Paquete Turístico</label>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="gastoPaquete" formControlName="gastosPaquete.huboGasto">
+            <label class="form-check-label" for="gastoPaquete">¿Hubo gasto?</label>
           </div>
           
-          <div class="mb-3" *ngIf="encuestaForm.get('motivoViaje')?.value === 'Otro'">
-            <label class="form-label">Especifique el motivo del viaje</label>
-            <input type="text" class="form-control" formControlName="motivoViajeOtro">
-          </div>
-          
-          <div class="mb-3">
-            <label class="form-label">7. ¿Cómo organizó su viaje?</label>
-            <select class="form-select" formControlName="organizacionViaje" (change)="onOrganizacionViajeChange($event)">
-              <option value="">Seleccione...</option>
-              <option *ngFor="let opcion of organizacionViajeOptions" [value]="opcion">{{ opcion }}</option>
-            </select>
-            <div *ngIf="submitted && encuestaForm.get('organizacionViaje')?.errors" class="text-danger">
-              Este campo es requerido
-            </div>
-          </div>
-          
-          <div class="mb-3" *ngIf="encuestaForm.get('organizacionViaje')?.value === 'Otro'">
-            <label class="form-label">Especifique cómo organizó su viaje</label>
-            <input type="text" class="form-control" formControlName="organizacionViajeOtro">
-          </div>
-          
-          <div class="mb-3" *ngIf="['Paquete turístico organizado por una agencia de viajes en Colombia', 
-                                    'Paquete turístico organizado por una agencia de viajes en el país de visita',
-                                    'Paquete turístico organizado por terceros que no sean agencias de viajes'].includes(encuestaForm.get('organizacionViaje')?.value)">
-            <label class="form-label">a. ¿Qué tipo de servicios comprendió el paquete turístico?</label>
-            <div class="form-check" *ngFor="let servicio of serviciosPaqueteOptions">
-              <input class="form-check-input" type="checkbox" [id]="'servicio-' + servicio" 
-                     (change)="onServicioPaqueteChange(servicio, $event.target.checked)"
-                     [checked]="serviciosPaqueteArray.value.includes(servicio)">
-              <label class="form-check-label" [for]="'servicio-' + servicio">{{ servicio }}</label>
+          <div *ngIf="encuestaForm.get('gastosPaquete.huboGasto').value" class="border p-3 mb-3">
+            <div class="row">
+              <div class="col-md-4">
+                <h6>Pagado por usted</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosPaquete.pagadoPorUsted.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosPaquete.pagadoPorUsted.tipoMoneda">
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <h6>Terceros que NO hacen parte del grupo</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosPaquete.tercerosNoGrupo.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosPaquete.tercerosNoGrupo.tipoMoneda">
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <h6>Terceros que SI hacen parte del grupo</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosPaquete.tercerosSiGrupo.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosPaquete.tercerosSiGrupo.tipoMoneda">
+                </div>
+              </div>
             </div>
             
-            <div class="mt-2" *ngIf="serviciosPaqueteArray.value.includes('Otro servicio')">
-              <label class="form-label">Especifique el otro servicio</label>
-              <input type="text" class="form-control" formControlName="serviciosPaqueteOtro">
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">¿Para cuántas personas?</label>
+                <input type="number" class="form-control" formControlName="gastosPaquete.paraCuantasPersonas" min="1">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <!-- CAPÍTULO III - Gastos -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5>CAPÍTULO III - Gastos</h5>
-        </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label">9. Gastos del Paquete Turístico</label>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="gastoPaquete" formControlName="gastosPaquete.huboGasto">
-              <label class="form-check-label" for="gastoPaquete">¿Hubo gasto?</label>
-            </div>
-            
-            <div *ngIf="encuestaForm.get('gastosPaquete.huboGasto')?.value" class="border p-3 mb-3">
-              <div class="row">
-                <div class="col-md-4">
-                  <h6>Pagado por usted</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosPaquete.pagadoPorUsted.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosPaquete.pagadoPorUsted.tipoMoneda">
-                  </div>
-                </div>
-                
-                <div class="col-md-4">
-                  <h6>Terceros que NO hacen parte del grupo</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosPaquete.tercerosNoGrupo.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosPaquete.tercerosNoGrupo.tipoMoneda">
-                  </div>
-                </div>
-                
-                <div class="col-md-4">
-                  <h6>Terceros que SI hacen parte del grupo</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosPaquete.tercerosSiGrupo.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosPaquete.tercerosSiGrupo.tipoMoneda">
-                  </div>
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-6">
-                  <label class="form-label">¿Para cuántas personas?</label>
-                  <input type="number" class="form-control" formControlName="gastosPaquete.paraCuantasPersonas" min="1">
-                </div>
-              </div>
-            </div>
+        
+        <div class="mb-3">
+          <label class="form-label">b. Gastos de Transporte Internacional</label>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="gastoTransporte" formControlName="gastosTransporte.huboGasto">
+            <label class="form-check-label" for="gastoTransporte">¿Hubo gasto?</label>
           </div>
           
-          <div class="mb-3">
-            <label class="form-label">b. Gastos de Transporte Internacional</label>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="gastoTransporte" formControlName="gastosTransporte.huboGasto">
-              <label class="form-check-label" for="gastoTransporte">¿Hubo gasto?</label>
+          <div *ngIf="encuestaForm.get('gastosTransporte.huboGasto').value" class="border p-3">
+            <div class="row">
+              <div class="col-md-4">
+                <h6>Pagado por usted</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosTransporte.pagadoPorUsted.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosTransporte.pagadoPorUsted.tipoMoneda">
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <h6>Terceros que NO hacen parte del grupo</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosTransporte.tercerosNoGrupo.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosTransporte.tercerosNoGrupo.tipoMoneda">
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <h6>Terceros que SI hacen parte del grupo</h6>
+                <div class="mb-2">
+                  <label class="form-label">Valor</label>
+                  <input type="number" class="form-control" formControlName="gastosTransporte.tercerosSiGrupo.valor" min="0">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Tipo de Moneda</label>
+                  <input type="text" class="form-control" formControlName="gastosTransporte.tercerosSiGrupo.tipoMoneda">
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">¿Para cuántas personas?</label>
+                <input type="number" class="form-control" formControlName="gastosTransporte.paraCuantasPersonas" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Países de visita -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5>10. Países de Visita y Alojamiento</h5>
+      </div>
+      <div class="card-body">
+        <div formArrayName="paisesVisita">
+          <div *ngFor="let pais of paisesVisitaArray.controls; let i = index" [formGroupName]="i" class="border p-3 mb-3">
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">País de visita</label>
+                <input type="text" class="form-control" formControlName="pais">
+              </div>
+              <div class="col-md-6 text-end" *ngIf="i > 0">
+                <button type="button" class="btn btn-danger btn-sm" (click)="removePaisVisita(i)">Eliminar</button>
+              </div>
             </div>
             
-            <div *ngIf="encuestaForm.get('gastosTransporte.huboGasto')?.value" class="border p-3">
-              <div class="row">
-                <div class="col-md-4">
-                  <h6>Pagado por usted</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosTransporte.pagadoPorUsted.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosTransporte.pagadoPorUsted.tipoMoneda">
-                  </div>
-                </div>
-                
-                <div class="col-md-4">
-                  <h6>Terceros que NO hacen parte del grupo</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosTransporte.tercerosNoGrupo.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosTransporte.tercerosNoGrupo.tipoMoneda">
-                  </div>
-                </div>
-                
-                <div class="col-md-4">
-                  <h6>Terceros que SI hacen parte del grupo</h6>
-                  <div class="mb-2">
-                    <label class="form-label">Valor</label>
-                    <input type="number" class="form-control" formControlName="gastosTransporte.tercerosSiGrupo.valor" min="0">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Tipo de Moneda</label>
-                    <input type="text" class="form-control" formControlName="gastosTransporte.tercerosSiGrupo.tipoMoneda">
-                  </div>
-                </div>
+            <div class="row mt-2">
+              <div class="col-md-3">
+                <label class="form-label">Vivienda Propia (noches)</label>
+                <input type="number" class="form-control" formControlName="viviendaPropia" min="0">
               </div>
-              
-              <div class="row">
-                <div class="col-md-6">
-                  <label class="form-label">¿Para cuántas personas?</label>
-                  <input type="number" class="form-control" formControlName="gastosTransporte.paraCuantasPersonas" min="1">
-                </div>
+              <div class="col-md-3">
+                <label class="form-label">Hotel / Apartahotel (noches)</label>
+                <input type="number" class="form-control" formControlName="hotelApartahotel" min="0">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Vivienda familiar o de amigos (noches)</label>
+                <input type="number" class="form-control" formControlName="viviendaFamiliar" min="0">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Vivienda en alquiler (noches)</label>
+                <input type="number" class="form-control" formControlName="viviendaAlquiler" min="0">
+              </div>
+            </div>
+            
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <label class="form-label">Otro tipo de vivienda (noches)</label>
+                <input type="number" class="form-control" formControlName="otroTipoVivienda" min="0">
               </div>
             </div>
           </div>
         </div>
+        
+        <button type="button" class="btn btn-secondary mt-2" (click)="addPaisVisita()">Agregar otro país</button>
       </div>
-      
-      <!-- Países de visita -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5>10. Países de Visita y Alojamiento</h5>
-        </div>
-        <div class="card-body">
-          <div formArrayName="paisesVisita">
-            <div *ngFor="let pais of paisesVisitaArray.controls; let i = index" [formGroupName]="i" class="border p-3 mb-3">
-              <div class="row">
-                <div class="col-md-6">
-                  <label class="form-label">País de visita</label>
-                  <input type="text" class="form-control" formControlName="pais">
-                </div>
-                <div class="col-md-6 text-end" *ngIf="i > 0">
-                  <button type="button" class="btn btn-danger btn-sm" (click)="removePaisVisita(i)">Eliminar</button>
-                </div>
-              </div>
-              
-              <div class="row mt-2">
-                <div class="col-md-3">
-                  <label class="form-label">Vivienda Propia</label>
-                  <input type="number" class="form-control" formControlName="viviendaPropia" min="0">
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Hotel / Apartahotel</label>
-                  <input type="number" class="form-control" formControlName="hotelApartahotel" min="0">
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Vivienda familiar o de amigos</label>
-                  <input type="number" class="form-control" formControlName="viviendaFamiliar" min="0">
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Vivienda en alquiler</label>
-                  <input type="number" class="form-control" formControlName="viviendaAlquiler" min="0">
-                </div>
-              </div>
-              
-              <div class="row mt-2">
-                <div class="col-md-6">
-                  <label class="form-label">Otro tipo de vivienda</label>
-                  <input type="number" class="form-control" formControlName="otroTipoVivienda" min="0">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <button type="button" class="btn btn-secondary mt-2" (click)="addPaisVisita()">Agregar otro país</button>
-        </div>
-      </div>
-      
-      <!-- Mensajes y botones -->
-      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-      
-      <div class="d-flex justify-content-between">
-        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
-        <button type="submit" class="btn btn-primary">{{ editMode ? 'Actualizar' : 'Guardar' }}</button>
-      </div>
-    </form>
-  </div>
+    </div>
+    
+    <!-- Mensajes y botones -->
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">{{ editMode ? 'Actualizar' : 'Guardar' }}</button>
+    </div>
+  </form>
+</div>

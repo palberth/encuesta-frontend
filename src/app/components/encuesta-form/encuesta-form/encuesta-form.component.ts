@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { EncuestaService } from '../../../services/encuesta.service';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-encuesta-form',
@@ -9,13 +7,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./encuesta-form.component.css']
 })
 export class EncuestaFormComponent implements OnInit {
-  encuestaForm: FormGroup;
+  encuestaForm!: FormGroup;
   submitted = false;
+  editMode = false;
   successMessage = '';
   errorMessage = '';
-  editMode = false;
-  currentEncuestaId: number | null = null;
 
+  // Opciones para los selectores
   viajaConOptions = ['Solo', 'Amigos', 'Familia', 'Compañeros de trabajo', 'Otro'];
   motivoViajeOptions = [
     'Vacaciones (recreación, ocio, sol y playa)',
@@ -42,7 +40,7 @@ export class EncuestaFormComponent implements OnInit {
   serviciosPaqueteOptions = [
     'Alojamiento',
     'Transporte internacional',
-    'Alimentos y bebidas (No incluidos en el alojamiento)',
+    'Alimentos y bebidas',
     'Servicios culturales y de entretenimiento',
     'Servicios deportivos y recreacionales',
     'Tours en destino (con servicio de guía)',
@@ -51,11 +49,13 @@ export class EncuestaFormComponent implements OnInit {
     'Otro servicio'
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private encuestaService: EncuestaService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  initializeForm(): void {
     this.encuestaForm = this.fb.group({
       paisResidencia: ['', Validators.required],
       nacionalidad: ['', Validators.required],
@@ -103,82 +103,76 @@ export class EncuestaFormComponent implements OnInit {
         paraCuantasPersonas: ['']
       }),
       paisesVisita: this.fb.array([
-        this.fb.group({
-          pais: [''],
-          viviendaPropia: [''],
-          hotelApartahotel: [''],
-          viviendaFamiliar: [''],
-          viviendaAlquiler: [''],
-          otroTipoVivienda: ['']
-        })
+        this.createPaisVisitaGroup()
       ])
     });
   }
 
-  ngOnInit(): void {
-    // Verificar si estamos en modo edición
-    const state = history.state;
-    if (state && state.encuesta) {
-      this.editMode = true;
-      this.currentEncuestaId = state.encuesta.id;
-      this.loadEncuestaData(state.encuesta);
-    }
-  }
-
-  loadEncuestaData(encuesta: any): void {
-    // Lógica para cargar los datos de la encuesta en el formulario
-    this.encuestaForm.patchValue({
-      paisResidencia: encuesta.paisResidencia,
-      nacionalidad: encuesta.nacionalidad,
-      sexo: encuesta.sexo,
-      edad: encuesta.edad,
-      viajaCon: encuesta.viajaCon,
-      viajaConOtro: encuesta.viajaConOtro,
-      cantidadPersonas: encuesta.cantidadPersonas,
-      motivoViaje: encuesta.motivoViaje,
-      motivoViajeOtro: encuesta.motivoViajeOtro,
-      organizacionViaje: encuesta.organizacionViaje,
-      organizacionViajeOtro: encuesta.organizacionViajeOtro
+  createPaisVisitaGroup() {
+    return this.fb.group({
+      pais: [''],
+      viviendaPropia: [''],
+      hotelApartahotel: [''],
+      viviendaFamiliar: [''],
+      viviendaAlquiler: [''],
+      otroTipoVivienda: ['']
     });
-
-    // Cargar servicios del paquete
-    const servicios = encuesta.serviciosPaquete ? JSON.parse(encuesta.serviciosPaquete) : [];
-    servicios.forEach((servicio: string) => {
-      this.onServicioPaqueteChange(servicio, true);
-    });
-
-    // Cargar gastos
-    if (encuesta.gastosPaquete) {
-      const gastosPaquete = JSON.parse(encuesta.gastosPaquete);
-      this.encuestaForm.get('gastosPaquete')?.patchValue(gastosPaquete);
-    }
-
-    if (encuesta.gastosTransporte) {
-      const gastosTransporte = JSON.parse(encuesta.gastosTransporte);
-      this.encuestaForm.get('gastosTransporte')?.patchValue(gastosTransporte);
-    }
-
-    // Cargar países de visita
-    const paisesVisitaArray = this.encuestaForm.get('paisesVisita') as FormArray;
-    paisesVisitaArray.clear();
-    
-    if (encuesta.paisesVisita) {
-      const paisesVisita = JSON.parse(encuesta.paisesVisita);
-      paisesVisita.forEach((pais: any) => {
-        paisesVisitaArray.push(this.fb.group({
-          pais: [pais.pais],
-          viviendaPropia: [pais.viviendaPropia],
-          hotelApartahotel: [pais.hotelApartahotel],
-          viviendaFamiliar: [pais.viviendaFamiliar],
-          viviendaAlquiler: [pais.viviendaAlquiler],
-          otroTipoVivienda: [pais.otroTipoVivienda]
-        }));
-      });
-    }
   }
 
   get serviciosPaqueteArray(): FormArray {
     return this.encuestaForm.get('serviciosPaquete') as FormArray;
+  }
+
+  get paisesVisitaArray(): FormArray {
+    return this.encuestaForm.get('paisesVisita') as FormArray;
+  }
+
+  onViajaConChange(event: any): void {
+    const viajaConValue = event?.target?.value || event;
+    
+    if (viajaConValue === 'Solo') {
+      this.encuestaForm.get('cantidadPersonas')?.reset();
+      this.encuestaForm.get('cantidadPersonas')?.clearValidators();
+    } else {
+      this.encuestaForm.get('cantidadPersonas')?.setValidators([
+        Validators.required,
+        Validators.min(1)
+      ]);
+    }
+    
+    this.encuestaForm.get('cantidadPersonas')?.updateValueAndValidity();
+    
+    if (viajaConValue === 'Otro') {
+      this.encuestaForm.get('viajaConOtro')?.setValidators([Validators.required]);
+    } else {
+      this.encuestaForm.get('viajaConOtro')?.clearValidators();
+      this.encuestaForm.get('viajaConOtro')?.reset();
+    }
+    this.encuestaForm.get('viajaConOtro')?.updateValueAndValidity();
+  }
+
+  onMotivoViajeChange(event: any): void {
+    const motivoValue = event?.target?.value || event;
+    
+    if (motivoValue === 'Otro') {
+      this.encuestaForm.get('motivoViajeOtro')?.setValidators([Validators.required]);
+    } else {
+      this.encuestaForm.get('motivoViajeOtro')?.clearValidators();
+      this.encuestaForm.get('motivoViajeOtro')?.reset();
+    }
+    this.encuestaForm.get('motivoViajeOtro')?.updateValueAndValidity();
+  }
+
+  onOrganizacionViajeChange(event: any): void {
+    const organizacionValue = event?.target?.value || event;
+    
+    if (organizacionValue === 'Otro') {
+      this.encuestaForm.get('organizacionViajeOtro')?.setValidators([Validators.required]);
+    } else {
+      this.encuestaForm.get('organizacionViajeOtro')?.clearValidators();
+      this.encuestaForm.get('organizacionViajeOtro')?.reset();
+    }
+    this.encuestaForm.get('organizacionViajeOtro')?.updateValueAndValidity();
   }
 
   onServicioPaqueteChange(servicio: string, isChecked: boolean): void {
@@ -192,23 +186,16 @@ export class EncuestaFormComponent implements OnInit {
     }
   }
 
-  get paisesVisitaArray(): FormArray {
-    return this.encuestaForm.get('paisesVisita') as FormArray;
-  }
-
   addPaisVisita(): void {
-    this.paisesVisitaArray.push(this.fb.group({
-      pais: [''],
-      viviendaPropia: [''],
-      hotelApartahotel: [''],
-      viviendaFamiliar: [''],
-      viviendaAlquiler: [''],
-      otroTipoVivienda: ['']
-    }));
+    this.paisesVisitaArray.push(this.createPaisVisitaGroup());
   }
 
   removePaisVisita(index: number): void {
     this.paisesVisitaArray.removeAt(index);
+  }
+
+  onCancel(): void {
+    // Implementa la lógica de cancelación
   }
 
   onSubmit(): void {
@@ -217,44 +204,8 @@ export class EncuestaFormComponent implements OnInit {
     if (this.encuestaForm.invalid) {
       return;
     }
-
-    const formData = this.encuestaForm.value;
     
-    // Preparar datos para enviar
-    const encuestaData = {
-      ...formData,
-      serviciosPaquete: JSON.stringify(formData.serviciosPaquete),
-      gastosPaquete: JSON.stringify(formData.gastosPaquete),
-      gastosTransporte: JSON.stringify(formData.gastosTransporte),
-      paisesVisita: JSON.stringify(formData.paisesVisita)
-    };
-
-    if (this.editMode && this.currentEncuestaId) {
-      this.encuestaService.updateEncuesta(this.currentEncuestaId, encuestaData).subscribe({
-        next: () => {
-          this.successMessage = 'Encuesta actualizada con éxito';
-          setTimeout(() => this.router.navigate(['/encuestas']), 2000);
-        },
-        error: (err) => {
-          this.errorMessage = 'Error al actualizar la encuesta';
-          console.error(err);
-        }
-      });
-    } else {
-      this.encuestaService.createEncuesta(encuestaData).subscribe({
-        next: () => {
-          this.successMessage = 'Encuesta creada con éxito';
-          setTimeout(() => this.router.navigate(['/encuestas']), 2000);
-        },
-        error: (err) => {
-          this.errorMessage = 'Error al crear la encuesta';
-          console.error(err);
-        }
-      });
-    }
-  }
-
-  onCancel(): void {
-    this.router.navigate(['/encuestas']);
+    console.log('Formulario válido:', this.encuestaForm.value);
+    this.successMessage = 'Encuesta guardada correctamente';
   }
 }
