@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
 
 // PrimeNG modules
 import { TableModule } from 'primeng/table';
@@ -13,9 +12,10 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { AppComponent } from './app.component';
-import { EncuestaFormComponent } from '../app/components/encuesta-form/encuesta-form/encuesta-form.component';
-import { EncuestaListComponent } from '../app/components/encuesta-form/encuesta-list/encuesta-list.component';
+import { EncuestaFormComponent } from './components/encuesta-form/encuesta-form/encuesta-form.component';
+import { EncuestaListComponent } from './components/encuesta-form/encuesta-list/encuesta-list.component';
 import { LoginComponent } from './components/login/login.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -29,8 +29,7 @@ import { LoginComponent } from './components/login/login.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    RouterModule,
-    // PrimeNG Modules
+    AppRoutingModule,
     TableModule,
     ToastModule,
     ConfirmDialogModule,
