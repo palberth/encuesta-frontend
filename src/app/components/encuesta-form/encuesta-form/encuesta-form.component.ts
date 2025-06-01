@@ -175,10 +175,11 @@ export class EncuestaFormComponent implements OnInit {
     this.encuestaForm.get('organizacionViajeOtro')?.updateValueAndValidity();
   }
 
-  onServicioPaqueteChange(servicio: string, isChecked: boolean): void {
+  onServicioPaqueteChange(servicio: string, event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
     const serviciosArray = this.serviciosPaqueteArray;
     
-    if (isChecked) {
+    if (checked) {
       serviciosArray.push(this.fb.control(servicio));
     } else {
       const index = serviciosArray.controls.findIndex(x => x.value === servicio);

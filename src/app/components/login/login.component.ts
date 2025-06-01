@@ -26,7 +26,7 @@ export class LoginComponent {
 
   onLogin(): void {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
+      const { username, password } = this.loginForm?.value;
       this.authService.login(username, password).subscribe({
         next: () => {
           this.router.navigate(['/encuestas']);
@@ -41,7 +41,7 @@ export class LoginComponent {
 
   onRegister(): void {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
+      const { username, password } = this.loginForm?.value;
       this.authService.register(username, password).subscribe({
         next: () => {
           this.showRegisterForm = false;
